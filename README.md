@@ -8,7 +8,7 @@ Projeto criado para fins de **portfólio**.
 
 ## Tecnologias
 
-- ASP.NET Core versão 10.0
+- ASP.NET Core
 - Entity Framework Core versão 10.0
 - SQLite
 - LINQ
