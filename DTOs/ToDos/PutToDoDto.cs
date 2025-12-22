@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace TodoList.DTOs.ToDos {
-    public class UpdateToDoDto {
+    public class PutToDoDto {
 
         [Required(ErrorMessage = "O Título é obrigatório")]
         [MaxLength(200, ErrorMessage = "O título não pode exceder 200 caracteres")]

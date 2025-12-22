@@ -16,15 +16,15 @@ namespace TodoList.Controllers {
         [HttpGet]
         public async Task<IActionResult> Get(
             [FromServices] ToDoListDataContext context,
-            [FromQuery] ToDoQueryDto dto) {
+            [FromQuery] GetToDoDto dto) {
             try {
 
                 if (!ModelState.IsValid)
                     return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
 
 
-                var page = dto.Page;
-                var pageSize = dto.PageSize;
+                var page = dto.Page!.Value;
+                var pageSize = dto.PageSize!.Value;
                 var isCompleted = dto.IsCompleted;
                 var priority = dto.Priority;
 
@@ -109,7 +109,7 @@ namespace TodoList.Controllers {
 
         [HttpPost]
         public async Task<IActionResult> Post(
-            [FromBody] CreateToDoDto dto,
+            [FromBody] PostToDoDto dto,
             [FromServices] ToDoListDataContext context) {
 
             if (!ModelState.IsValid)
@@ -153,7 +153,7 @@ namespace TodoList.Controllers {
         [HttpPut("{id:long}")]
         public async Task<IActionResult> Put(
             [FromRoute] long id,
-            [FromBody] UpdateToDoDto dto,
+            [FromBody] PutToDoDto dto,
             [FromServices] ToDoListDataContext context) {
 
             if (!ModelState.IsValid)
