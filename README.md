@@ -4,8 +4,6 @@ Pequeno projeto desenvolvido em **ASP.NET Core** para gerenciamento de tarefas, 
 
 Projeto criado para fins de **portfólio**.
 
-Projeto criado para fins de **portfólio**.
-
 ---
 
 ## Tecnologias
