@@ -13,12 +13,15 @@ Projeto desenvolvido para demonstrar conhecimentos em **APIs REST** com **ASP.NE
 - SQLite
 - LINQ
 - Swagger
+- JWT Authentication
 
 ---
 
 ## Funcionalidades
 
 - CRUD completo de tarefas
+- Autenticação via JWT
+- Usuários só acessam suas próprias tarefas
 - Paginação
 - Filtro por status (`IsCompleted`)
 - Filtro por prioridade (`Priority`)
