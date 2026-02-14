@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using TodoList.Data;
 using TodoList.DTOs;
 using TodoList.DTOs.ToDos;
@@ -10,6 +13,7 @@ using TodoList.ViewModels;
 
 namespace TodoList.Controllers {
     [ApiController]
+    [Authorize]
     [Route("v1/todos")]
     public class ToDoController : ControllerBase {
 
@@ -22,13 +26,16 @@ namespace TodoList.Controllers {
                 if (!ModelState.IsValid)
                     return BadRequest(new ResultViewModel<string>(ModelState.GetErrors()));
 
+                var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
+                    return Unauthorized(new ResultViewModel<string>("Token inválido"));
 
                 var page = dto.Page!.Value;
                 var pageSize = dto.PageSize!.Value;
                 var isCompleted = dto.IsCompleted;
                 var priority = dto.Priority;
 
-                IQueryable<ToDo> contextQuery = context.ToDos.AsNoTracking();
+                IQueryable<ToDo> contextQuery = context.ToDos.AsNoTracking().Where(x => x.UserId == userId);
 
                 if (isCompleted == 0) {
                     contextQuery = contextQuery.Where(x => x.IsCompleted == false);
@@ -54,7 +61,7 @@ namespace TodoList.Controllers {
 
                     })
                     .OrderBy(x => x.CreatedAt)
-                    .Skip(page * pageSize)
+                    .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToListAsync();
 
@@ -80,9 +87,15 @@ namespace TodoList.Controllers {
             [FromRoute] long id,
             [FromServices] ToDoListDataContext context) {
             try {
+
+                var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
+                    return Unauthorized(new ResultViewModel<string>("Token inválido"));
+
                 var toDo = await context.ToDos
                     .AsNoTracking()
                     .Where(x => x.Id == id)
+                    .Where(x => x.UserId == userId)
                     .Select(x => new ResponseToDoDto {
                         Id = x.Id,
                         Title = x.Title,
@@ -115,12 +128,17 @@ namespace TodoList.Controllers {
             if (!ModelState.IsValid)
                 return BadRequest(new ResultViewModel<List<string>>(ModelState.GetErrors()));
 
+            var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
+                return Unauthorized(new ResultViewModel<string>("Token inválido"));
+
             try {
                 var toDo = new ToDo {
                     Title = dto.Title,
                     Description = dto.Description,
                     Priority = dto.Priority,
                     DueDate = dto.DueDate,
+                    UserId = userId
                 };
 
                 await context.ToDos.AddAsync(toDo);
@@ -160,7 +178,13 @@ namespace TodoList.Controllers {
                 return BadRequest(new ResultViewModel<List<string>>(ModelState.GetErrors()));
 
             try {
+
+                var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
+                    return Unauthorized(new ResultViewModel<string>("Token inválido"));
+
                 var toDo = await context.ToDos
+                    .Where(x => x.UserId == userId)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (toDo == null) {
@@ -206,7 +230,12 @@ namespace TodoList.Controllers {
                 return BadRequest(new ResultViewModel<List<string>>(ModelState.GetErrors()));
 
             try {
+                var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
+                    return Unauthorized(new ResultViewModel<string>("Token inválido"));
+
                 var toDo = await context.ToDos
+                    .Where(x => x.UserId == userId)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (toDo == null) {
@@ -258,7 +287,12 @@ namespace TodoList.Controllers {
             [FromServices] ToDoListDataContext context) {
 
             try {
+                var sub = User.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var userId))
+                    return Unauthorized(new ResultViewModel<string>("Token inválido"));
+
                 var toDo = await context.ToDos
+                    .Where(x => x.UserId == userId)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (toDo == null) {

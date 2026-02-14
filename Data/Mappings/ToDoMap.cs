@@ -8,15 +8,34 @@ namespace TodoList.Data.Mappings {
             
             builder.ToTable("ToDos");
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).ValueGeneratedOnAdd().IsRequired();
 
-            builder.Property(x => x.Title).IsRequired().HasMaxLength(200);
-            builder.Property(x => x.Description).HasMaxLength(1000);
-            builder.Property(x => x.IsCompleted).IsRequired();
-            builder.Property(x => x.Priority).IsRequired();
-            builder.Property(x => x.CreatedAt).IsRequired();
+            builder.Property(x => x.Id)
+                .ValueGeneratedOnAdd()
+                .IsRequired();
+
+            builder.Property(x => x.Title)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(x => x.Description)
+                .HasMaxLength(1000);
+
+            builder.Property(x => x.IsCompleted)
+                .IsRequired();
+
+            builder.Property(x => x.Priority)
+                .IsRequired();
+
+            builder.Property(x => x.CreatedAt)
+                .IsRequired();
+
             builder.Property(x => x.DueDate);
 
+            builder
+                .HasOne(x => x.User)
+                .WithMany(x => x.ToDos)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

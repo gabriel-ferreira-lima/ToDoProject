@@ -8,9 +8,11 @@ namespace TodoList.Data {
         }
         
         public DbSet<ToDo> ToDos { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) {
-            modelBuilder.ApplyConfiguration(new ToDoMap());
+        protected override void OnModelCreating(ModelBuilder builder) {
+            builder.ApplyConfiguration(new ToDoMap());
+            builder.ApplyConfiguration(new UserMap());
         }
     }
 }
